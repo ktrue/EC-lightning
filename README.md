@@ -10,12 +10,12 @@ The script will load the HTML page from the EC website, cache it, and parse the 
 
 <dt>**id=AAA**</dt>
 
-<dd>If present, the script will load lightning map images from the 'AAA' lightning site. The available lightning maps are:  
-  **id=NAT** - National lightning (script default $lightningID)  
-  **id=PAC** - Pacific region lightning  
-  **id=WRN** - Prairies region lightning  
-  **id=ONT** - Ontario region lightning  
-  **id=QUE** - Quebec region lightning  
+<dd>If present, the script will load lightning map images from the 'AAA' lightning site. The available lightning maps are:<br>  
+  **id=NAT** - National lightning (script default $lightningID) <br> 
+  **id=PAC** - Pacific region lightning <br> 
+  **id=WRN** - Prairies region lightning <br> 
+  **id=ONT** - Ontario region lightning <br> 
+  **id=QUE** - Quebec region lightning <br> 
   **id=ATL** - Atlantic region lightning  
 </dd>
 
@@ -38,10 +38,8 @@ The script will load the HTML page from the EC website, cache it, and parse the 
 <dt>**imgonly=Y**</dt>
 
 <dd>Return a 1/4 size static image of the latest lightning selected.  
-This is for use in an <img> statement on your page like this:  
-<img src="http://your.website.com/ec-lightning.php?imgonly=Y"  
-width="290" height="240" alt="lightning" title="lightning" />  
-See example 1 below for usage.  
+This is for use in an <img> statement on your page.
+See example 1 below for usage.<br>  
 Note: the small lightning map images are width="290" and vary in height.  
 </dd>
 
