@@ -4,8 +4,9 @@
 // Version 1.00 - 15-Oct-2016 - initial release based on ec-radar.php V2.01 and a lot of rewrite
 // Version 1.01 - 13-Oct-2017 - use curl for fetch, use HTTPS to EC website
 // Version 1.02 - 15-Oct-2017 - corrected undefined function error now() -> time()
+// Version 1.03 - 18-Jan-2022 - fix for extract of source HTML Charset to use
 //
-  $Version = "V1.02 - 15-Oct-2017";
+  $Version = "V1.03 - 18-Jan-2022";
 //
 // Settings:
 // --------- start of settings ----------
@@ -242,7 +243,7 @@ if (! $forceRefresh) {
 	  print "<p>Sorry. Incomplete file received from Environment Canada website.</p>\n";
 	  exit;
   }
-  preg_match('|charset="{0,1}([^"]+)"{0,1}|i',$site,$matches);
+  preg_match('|charset="{0,1}([^"]+)"{0,1}\r|i',$site,$matches);
   
   if (isset($matches[1])) {
     $charsetInput = strtoupper($matches[1]);
