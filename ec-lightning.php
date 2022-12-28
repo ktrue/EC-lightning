@@ -5,8 +5,9 @@
 // Version 1.01 - 13-Oct-2017 - use curl for fetch, use HTTPS to EC website
 // Version 1.02 - 15-Oct-2017 - corrected undefined function error now() -> time()
 // Version 1.03 - 18-Jan-2022 - fix for extract of source HTML Charset to use
+// Version 1.04 - 27-Dec-2022 - fixes for PHP 8.1
 //
-  $Version = "V1.03 - 18-Jan-2022";
+  $Version = "V1.04 - 27-Dec-2022";
 //
 // Settings:
 // --------- start of settings ----------
@@ -287,7 +288,7 @@ if (! $forceRefresh) {
 	   $ECLlegend = 
 	   "<table class=\"EClightning\" style=\"border: 1px solid black; margin: 1em auto;\">\n" .
 	   "<tr><td width=\"55px\" style=\"text-align: right;\">\n".
-	   "<img src=\"${lightningDir}legendLightning.png\" alt=\"red dot\" width=\"50\" height=\"50\"/>\n".
+	   "<img src=\"{$lightningDir}legendLightning.png\" alt=\"red dot\" width=\"50\" height=\"50\"/>\n".
 	   "</td>\n";
 	   $ECLlegend .= "<td style=\"text-align: left\">\n<ul>\n";
 	   foreach ($matches[1] as $i => $val) {
@@ -432,16 +433,16 @@ Array
 	   $newestLightingTime = time() - $refetchSeconds - 10;
    }
    
-   if(file_exists($cacheDir."lightning-${lightningID}-${newestImageIdx}.png")) {
-	   $newestCacheFileTime = filemtime($cacheDir."lightning-${lightningID}-${newestImageIdx}.png");
+   if(file_exists($cacheDir."lightning-{$lightningID}-{$newestImageIdx}.png")) {
+	   $newestCacheFileTime = filemtime($cacheDir."lightning-{$lightningID}-{$newestImageIdx}.png");
 	   $Status .= "<!-- newest cache file  $newestCacheFileTime=" . 
 	              gmdate("D, d M Y H:i:s",$newestCacheFileTime).
 	              " UTC -->\n";
    }
    
   
-   if( !file_exists($cacheDir."lightning-${lightningID}-${newestImageIdx}.png") or
-      (file_exists($cacheDir."lightning-${lightningID}-${newestImageIdx}.png") and
+   if( !file_exists($cacheDir."lightning-{$lightningID}-{$newestImageIdx}.png") or
+      (file_exists($cacheDir."lightning-{$lightningID}-{$newestImageIdx}.png") and
 	   $newestCacheFileTime < $newestLightingTime) ) {
 	     $reloadImages = true;
 	} else {
@@ -459,7 +460,7 @@ if ($reloadImages and file_exists($RealCacheName) ) {  // do the reload of the i
   foreach($rawImgList as $i => $RawImgFile) {
 	$didIt = false;
 	$time_start = ECL_microtime_float();
-	$lightningCacheFile = "lightning-${lightningID}-${i}.png";
+	$lightningCacheFile = "lightning-{$lightningID}-{$i}.png";
 	$imgURL = $RawImgURL . $RawImgFile;
 	//$Status .= "<!-- Loading $imgURL \n to $cacheDir$lightningCacheFile -->\n";
 
@@ -477,7 +478,7 @@ if ($reloadImages and file_exists($RealCacheName) ) {  // do the reload of the i
   } // end foreach
 	
   // make thumbnail too for latest image
-	$imgname = "lightning-${lightningID}-${newestImageIdx}.png"; // get latest image name
+	$imgname = "lightning-{$lightningID}-{$newestImageIdx}.png"; // get latest image name
 	$thumbname = str_replace('-'.$newestImageIdx.'.png','-sm.png',$imgname);
     $time_start = ECL_microtime_float();
 	$image = imagecreatefrompng ($cacheDir . $imgname);;  // fetch our radar
@@ -515,8 +516,8 @@ if ($reloadImages and file_exists($RealCacheName) ) {  // do the reload of the i
 // now setup the list of images+text for the page display
 
   foreach($rawImgListText as $i => $RawImgText) {
-	if(file_exists($cacheDir."lightning-${lightningID}-${i}.png")) {
-	  $imgList[$i] = "lightning-${lightningID}-${i}.png";
+	if(file_exists($cacheDir."lightning-{$lightningID}-{$i}.png")) {
+	  $imgList[$i] = "lightning-{$lightningID}-{$i}.png";
 	  preg_match('|_(\d+)\.|',$rawImgList[$i],$matches);
       if(isset($matches[1])) {
 		 $tYr = substr($matches[1],0,4);
@@ -892,7 +893,7 @@ document.write( '<p style="width: 620px;margin: 1em auto;"><input type="button" 
 	$rT = $imgListText[$numImages-1];
 	$rN = $numImages;
     print "$siteHeading - $rT, $rN/$rN"; ?></span><br />
-<img src="<?php echo $lightningDir . "lightning-$lightningID-${newestImageIdx}.png"; ?>" alt="<?php echo $siteTitle; ?>" width="<?php echo $new_width; ?>" height="<?php echo $new_height; ?>" id="<?php echo $lightningID; ?>L_Ath_Slide" title="<?php echo $siteTitle; ?>" /></p>
+<img src="<?php echo $lightningDir . "lightning-$lightningID-{$newestImageIdx}.png"; ?>" alt="<?php echo $siteTitle; ?>" width="<?php echo $new_width; ?>" height="<?php echo $new_height; ?>" id="<?php echo $lightningID; ?>L_Ath_Slide" title="<?php echo $siteTitle; ?>" /></p>
 <noscript><p><?php echo $ECLNoJS; ?></p></noscript>
 <?php if ($ECLlegend <> '') { print "$ECLlegend"; } ?>
 
@@ -973,11 +974,11 @@ function <?php echo $lightningID; ?>LNext()
 //current file list/description 
 <?php
   for ($i=0;$i<$numImages;$i++) {
-    $lightningCacheFile = $lightningDir . "lightning-${lightningID}-$i.png";
+    $lightningCacheFile = $lightningDir . "lightning-{$lightningID}-$i.png";
 	$rT = $imgListText[$i];
 	$rN = $i+1;
 
-    print "${lightningID}Lg_ImageTable[${lightningID}Lg_imax++] = new Array (\"$lightningCacheFile\",\"$rT,  $rN/$numImages\");\n"; 
+    print "{$lightningID}Lg_ImageTable[{$lightningID}Lg_imax++] = new Array (\"$lightningCacheFile\",\"$rT,  $rN/$numImages\");\n"; 
   }
 ?>
 //end current file list/description
@@ -990,7 +991,7 @@ function <?php echo $lightningID; ?>LNext()
    else { // only one image 
    ?>
 <p style="width: 620px;margin: 1em auto;"><span id="<?php echo $lightningID; ?>description"><?php echo $imgListText[0] . ' 1/1'; ?></span><br />
-<img src="<?php echo $lightningDir . "lightning-$lightningID-${newestImageIdx}.png"; ?>" alt="<?php echo $siteHeading; ?>" width="<?php echo $new_width; ?> " height="<?php echo $new_height; ?>" title="<?php echo $siteHeading; ?>" /> </p>
+<img src="<?php echo $lightningDir . "lightning-$lightningID-{$newestImageIdx}.png"; ?>" alt="<?php echo $siteHeading; ?>" width="<?php echo $new_width; ?> " height="<?php echo $new_height; ?>" title="<?php echo $siteHeading; ?>" /> </p>
 <?php
  } // end only one image
 }
