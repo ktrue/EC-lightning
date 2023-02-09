@@ -6,8 +6,9 @@
 // Version 1.02 - 15-Oct-2017 - corrected undefined function error now() -> time()
 // Version 1.03 - 18-Jan-2022 - fix for extract of source HTML Charset to use
 // Version 1.04 - 27-Dec-2022 - fixes for PHP 8.1
+// Version 1.05 - 09-Feb-2023 - fixes for PHP 8.2 and Notice errata
 //
-  $Version = "V1.04 - 27-Dec-2022";
+  $Version = "V1.05 - 09-Feb-2023";
 //
 // Settings:
 // --------- start of settings ----------
@@ -247,7 +248,7 @@ if (! $forceRefresh) {
   preg_match('|charset="{0,1}([^"]+)"{0,1}\r|i',$site,$matches);
   
   if (isset($matches[1])) {
-    $charsetInput = strtoupper($matches[1]);
+    $charsetInput = trim(strtoupper($matches[1]));
   } else {
     $charsetInput = 'UTF-8';
   }
@@ -263,7 +264,7 @@ if (! $forceRefresh) {
 //   $Status .= "<!-- title matches\n" . print_r($matches,true) . " -->\n";
    
    $siteTitle = isset($matches[1][0])?$matches[1][0]:'';
-   if($doIconv and $siteTitle) { 
+   if($doIconv and !empty($siteTitle)) {
      $siteTitle = iconv($charsetInput,$charsetOutput.'//TRANSLIT',$siteTitle);
    }
    
@@ -271,7 +272,7 @@ if (! $forceRefresh) {
    preg_match_all('|<h1 id="wb-cont" property="name">(.*)</h1>|',$site,$matches);
 //   $Status .= "<!-- name matches\n" . print_r($matches,true) . " -->\n";
    $siteHeading = isset($matches[1][0])?$matches[1][0]:'';
-   if($doIconv and $siteHeading) { 
+   if($doIconv and !empty($siteHeading)) {
      $siteHeading = iconv($charsetInput,$charsetOutput.'//TRANSLIT',$siteHeading);
    }
 
@@ -292,7 +293,7 @@ if (! $forceRefresh) {
 	   "</td>\n";
 	   $ECLlegend .= "<td style=\"text-align: left\">\n<ul>\n";
 	   foreach ($matches[1] as $i => $val) {
-         if($doIconv) { 
+         if($doIconv) {
            $tstr = iconv($charsetInput,$charsetOutput.'//TRANSLIT',$val);
          } else {
 		   $tstr = $val;
@@ -313,7 +314,7 @@ if (! $forceRefresh) {
    } else {
      $noJSMsg = '';
    }
-   if($doIconv and $noJSMsg) { 
+   if($doIconv and !empty($noJSMsg)) {
      $noJSMsg = iconv($charsetInput,$charsetOutput.'//TRANSLIT',$noJSMsg);
    }
    $Status .= "<!-- noscript='$noJSMsg' -->\n";
@@ -323,11 +324,11 @@ if (! $forceRefresh) {
    $siteDescription = '';
    if(preg_match_all('|<p class="hidden-xs">(.*)</p>|Uis',$site,$matches) ) {
 	 $siteDescription = $matches[1][0];
-	 if($doIconv and $siteDescription) {
+	 if($doIconv and !empty($siteDescription)) {
 	   $siteDescription = iconv($charsetInput,$charsetOutput.'//TRANSLIT',$siteDescription);
 	 }
    }
-   
+
 // find and extract the details about the images available
    preg_match('|<div id="wxo-animator" ([^>]+)>|',$site,$matches);
 
@@ -869,7 +870,8 @@ function ECL_microtime_float()
 function ECL_gen_animation ( $numImages, $lightningID, $lightningDir, $aniSec) {
 // generate JavaScript and control buttons for rotating the images
   global $new_width, $new_height, $siteTitle, $imgListText, $ECLPlay, $ECLPrev, $ECLNext, $ECLNoJS,
-    $siteHeading, $noJSMsg, $ECLNO, $TZ, $TZOffsecSecs, $autoPlay, $ECLlegend, $siteDescription;
+    $siteHeading, $noJSMsg, $ECLNO, $TZ, $TZOffsecSecs, $autoPlay, $ECLlegend, $siteDescription,
+    $newestImageIdx;
 if ($numImages < 1) {
   print "<p>Sorry, no current lightning images for site $lightningID are available.</p>\n";
   return;
